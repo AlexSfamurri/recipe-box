@@ -9,61 +9,95 @@ const postStatusParagraph = document.getElementById("post-status");
 const savedDiv = document.getElementById("saved");
 
 async function getRecipe() {
-    recipeDiv.textContent = "";
 
-    const recId = recipeIdInput.value;
+    try{
+        recipeDiv.textContent = "";
+
+        const recId = recipeIdInput.value;
+        
+        const url = `https://dummyjson.com/recipes/${recId}`;
+
+        const response = await fetch(url);
+        const recipe = await response.json();
+        console.log(recipe);
+
+        const cardClasses = "card p-3 mb-5 w-50";
+
+        const card = document.createElement("div");
+        card.className = cardClasses;
+
+        const title = document.createElement("h2");
+        title.textContent = recipe.name;
+        card.appendChild(title);
+
+        const cuisine = document.createElement("h5");
+        cuisine.textContent = recipe.cuisine;
+        card.appendChild(cuisine);
+
+        const cookTime = document.createElement("p");
+        cookTime.textContent = `Your cook time should be ${recipe.cookTimeMinutes} minutes`;
+        card.appendChild(cookTime);
+
+        const caloricInfo = document.createElement("p");
+        caloricInfo.textContent = `Total calories: ${recipe.caloriesPerServing}`;
+        card.appendChild(caloricInfo);
+
+        const ingredients = document.createElement("ul");
+        recipe.ingredients.forEach(ingredient => {
+            const listItem = document.createElement("li");
+            listItem.textContent = ingredient;
+            ingredients.appendChild(listItem);
+        });
+        card.appendChild(ingredients);
+
+        const instructions = document.createElement("ol");
+        recipe.instructions.forEach((instruction)=>{
+            const listItem = document.createElement("li");
+            listItem.textContent = instruction;
+            instructions.appendChild(listItem);
+        })
+        card.appendChild(instructions);
+
+        const img = document.createElement("img");
+        img.src = recipe.image;
+        img.alt = recipe.name;
+        img.className = "rounded-2";
+        card.prepend(img);
+
+
+        recipeDiv.appendChild(card);
+    } catch(error){
+        console.log("an error has occured");
+        console.error(error);
+        
+    }
     
-    const url = `https://dummyjson.com/recipes/${recId}`;
+}
 
-    const response = await fetch(url);
-    const recipe = await response.json();
-    console.log(recipe);
+async function addDish() {
+    try{
+        const url = `https://dummyjson.com/recipes/add`;
+        const jsonedInput = JSON.stringify({ name: dishNameInput.value });
+        const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: jsonedInput,
+        });
+        
+        const newDish = await response.json()
+        console.log(newDish);
 
-    const cardClasses = "card p-3 mb-5 w-50";
+        const message = document.createElement("p");
+        message.className = "alert alert-success";
+        message.textContent = `Added ${newDish.name} to the box with the id of ${newDish.id} (practice server, no real save has been commited)`;
 
-    const card = document.createElement("div");
-    card.className = cardClasses;
-
-    const title = document.createElement("h2");
-    title.textContent = recipe.name;
-    card.appendChild(title);
-
-    const cuisine = document.createElement("h5");
-    cuisine.textContent = recipe.cuisine;
-    card.appendChild(cuisine);
-
-    const cookTime = document.createElement("p");
-    cookTime.textContent = `Your cook time should be ${recipe.cookTimeMinutes} minutes`;
-    card.appendChild(cookTime);
-
-    const caloricInfo = document.createElement("p");
-    caloricInfo.textContent = `Total calories: ${recipe.caloriesPerServing}`;
-    card.appendChild(caloricInfo);
-
-    const ingredients = document.createElement("ul");
-    recipe.ingredients.forEach(ingredient => {
-        const listItem = document.createElement("li");
-        listItem.textContent = ingredient;
-        ingredients.appendChild(listItem);
-    });
-    card.appendChild(ingredients);
-
-    const instructions = document.createElement("ol");
-    recipe.instructions.forEach((instruction)=>{
-        const listItem = document.createElement("li");
-        listItem.textContent = instruction;
-        instructions.appendChild(listItem);
-    })
-    card.appendChild(instructions);
-
-    const img = document.createElement("img");
-    img.src = recipe.image;
-    img.alt = recipe.name;
-    img.className = "rounded-2";
-    card.prepend(img);
-
-
-    recipeDiv.appendChild(card);
+        savedDiv.appendChild(message);
+        dishNameInput.value = "";
+    } catch(error){
+        console.log("An error has occured");
+        console.error(error);
+    }
 }
 
 getBtn.addEventListener("click", getRecipe);
+postBtn.addEventListener("click", addDish);
