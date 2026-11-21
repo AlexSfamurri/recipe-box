@@ -67,7 +67,7 @@ async function getRecipe() {
 
         recipeDiv.appendChild(card);
     } catch(error){
-        console.log("an error has occured");
+        console.log("an error has occured within GET");
         console.error(error);
         
     }
@@ -92,9 +92,10 @@ async function addDish() {
         message.textContent = `Added ${newDish.name} to the box with the id of ${newDish.id} (practice server, no real save has been commited)`;
 
         savedDiv.appendChild(message);
+
         dishNameInput.value = "";
     } catch(error){
-        console.log("An error has occured");
+        console.log("An error has occured within POST");
         console.error(error);
     }
 }
